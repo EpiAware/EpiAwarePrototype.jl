@@ -172,22 +172,35 @@ function apply_method(epiproblem::EpiProblem, method::AbstractEpiMethod, data;
         condition_parameters::NamedTuple = NamedTuple(), kwargs...)
     model = as_turing_model(epiproblem, data)
     cond_model = condition_model(model, fix_parameters, condition_parameters)
-    return apply_method(cond_model, method; kwargs...)
+    return apply_method(cond_model, method, data; kwargs...)
 end
 
-function apply_method(model::DynamicPPL.Model, method::EpiMethod, prev_result = nothing;
+# Apply a method to a model and wrap the solution as observables. Mirrors the
+# upstream two- and three-argument `apply_method`: run the method (`_apply_method`,
+# or the `EpiMethod` pre-sampler→sampler chain) and return an
+# [`EpiAwareObservables`](@ref) via [`generated_observables`](@ref).
+function apply_method(model::DynamicPPL.Model, method::AbstractEpiMethod, data;
         kwargs...)
+    solution = _run_method(model, method; kwargs...)
+    return generated_observables(model, data, solution)
+end
+
+function apply_method(model::DynamicPPL.Model, method::AbstractEpiMethod; kwargs...)
+    return apply_method(model, method, nothing; kwargs...)
+end
+
+# Run a method to its raw solution. An `EpiMethod` threads its pre-sampler steps
+# into the sampler; a bare method goes straight to its `_apply_method`.
+function _run_method(model::DynamicPPL.Model, method::EpiMethod; kwargs...)
+    prev_result = nothing
     for pre_sampler in method.pre_sampler_steps
         prev_result = _apply_method(model, pre_sampler, prev_result; kwargs...)
     end
     return _apply_method(model, method.sampler, prev_result; kwargs...)
 end
 
-# A bare method (sampler or optimiser) applied to a model goes straight to its
-# `_apply_method` implementation.
-function apply_method(model::DynamicPPL.Model, method::AbstractEpiMethod,
-        prev_result = nothing; kwargs...)
-    return _apply_method(model, method, prev_result; kwargs...)
+function _run_method(model::DynamicPPL.Model, method::AbstractEpiMethod; kwargs...)
+    _apply_method(model, method, nothing; kwargs...)
 end
 
 @doc raw"

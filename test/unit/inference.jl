@@ -24,7 +24,8 @@ end
         tspan = (1, 20))
     ydata = as_turing_model(problem, (; y_t = missing))().generated_y_t
     res = apply_method(problem, NUTSampler(; ndraws = 40, nchains = 1), (; y_t = ydata))
-    @test res !== nothing
+    @test res isa EpiAwareObservables
+    @test res.samples !== nothing
 end
 
 @testitem "EpiMethod threads a Pathfinder pre-step into NUTS" tags=[:sample] begin
@@ -41,7 +42,8 @@ end
         pre_sampler_steps = [ManyPathfinder(; ndraws = 10, nruns = 2)],
         sampler = NUTSampler(; ndraws = 40, nchains = 1))
     res = apply_method(problem, method, (; y_t = ydata))
-    @test res !== nothing
+    @test res isa EpiAwareObservables
+    @test res.samples !== nothing
 end
 
 @testitem "spread_draws produces tidy draw/chain/iteration columns" tags=[:sample] begin

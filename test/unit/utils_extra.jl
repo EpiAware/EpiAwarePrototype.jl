@@ -22,10 +22,13 @@ end
     using EpiAwarePrototype, Distributions, Turing, Random
     Random.seed!(81)
     @model g() = (x ~ Normal())
+    # apply_method wraps the solution in EpiAwareObservables; `.samples` is the
+    # raw inference result.
     chain = apply_method(g(), DirectSample(; n_samples = 10))
-    @test chain !== nothing
+    @test chain isa EpiAwareObservables
+    @test chain.samples !== nothing
     single = apply_method(g(), DirectSample())
-    @test haskey(single, @varname(x))
+    @test haskey(single.samples, @varname(x))
 end
 
 @testitem "get_param_array reshapes a Chains into (draws, chains)" begin
