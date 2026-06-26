@@ -66,6 +66,34 @@ function R_to_r(R₀, epi_model::AbstractEpiAwareModel; newton_steps = 2, Δd = 
 end
 
 @doc raw"
+Expected reproduction number ``R_t`` from an [`EpiData`](@ref) generation
+interval and an infection series.
+
+```math
+R_t = \frac{I_t}{\sum_{i=1}^{n} I_{t-i} g_i}
+```
+
+# Arguments
+
+  - `data`: the [`EpiData`](@ref) holding the generation interval.
+  - `infections`: the infection series (longer than the generation interval).
+
+# Examples
+```@example expected_Rt
+using EpiAwarePrototype
+data = EpiData([0.2, 0.3, 0.5], exp)
+expected_Rt(data, [100.0, 200, 300, 400, 500])
+```
+"
+function expected_Rt(data::EpiData, infections::Vector{<:Real})
+    n = data.len_gen_int
+    @assert n<length(infections) "Infections vector must be longer than the generation interval"
+    denom_Rt = [dot(reverse(data.gen_int), infections[(t - n):(t - 1)])
+                for t in (n + 1):length(infections)]
+    return infections[(n + 1):end] ./ denom_Rt
+end
+
+@doc raw"
 Reproduction number implied by an exponential growth rate `r` and discrete
 generation interval `w`: ``1 / \sum_i w_i e^{-r i}``.
 

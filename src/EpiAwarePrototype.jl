@@ -47,6 +47,7 @@ using AdvancedHMC: DiagEuclideanMetric
 using MCMCChains: Chains
 using Pathfinder: pathfinder, PathfinderResult
 using DataFramesMeta: DataFrame, @rename!
+using Tables: rowtable
 
 # Names used (and, for many, extended) by the prototype. Imported explicitly so
 # the package surface stays analysable by ExplicitImports even though the whole
@@ -54,7 +55,7 @@ using DataFramesMeta: DataFrame, @rename!
 using Distributions: Distributions, Distribution, Sampleable,
                      ContinuousUnivariateDistribution, ContinuousDistribution,
                      Normal, Poisson, NegativeBinomial, Gamma, truncated,
-                     cdf, ccdf, logcdf, logccdf, pdf, logpdf, quantile,
+                     cdf, ccdf, logcdf, logccdf, invlogcdf, pdf, logpdf, quantile,
                      params, mean, var, std, mode, skewness, kurtosis, succprob,
                      failprob
 using Statistics: Statistics
@@ -64,7 +65,7 @@ export AbstractEpiAwareModel, as_turing_model
 
 # --- utilities and distributions ---
 export accumulate_scan, get_state, HalfNormal, SafePoisson, SafeNegativeBinomial,
-       NegativeBinomialMeanClust, censored_pmf, condition_model
+       NegativeBinomialMeanClust, censored_pmf, censored_cdf, ∫F, condition_model
 
 # --- latent models ---
 export IID, HierarchicalNormal, RandomWalk, AR, MA, Intercept, FixedIntercept,
@@ -78,7 +79,7 @@ export TransformLatentModel, PrefixLatentModel, RecordExpectedLatent,
 
 # --- infection models ---
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       R_to_r, r_to_R
+       R_to_r, r_to_R, expected_Rt
 
 # --- ODE compartmental models ---
 export SIRParams, SEIRParams, ODEProcess
@@ -95,8 +96,9 @@ export Ascertainment, ascertainment_dayofweek, Aggregate, PrefixObservationModel
 export EpiAwareModel
 
 # --- inference orchestration ---
-export EpiProblem, EpiMethod, NUTSampler, ManyPathfinder, manypathfinder,
-       apply_method, EpiAwareObservables, generated_observables, spread_draws
+export EpiProblem, EpiMethod, NUTSampler, ManyPathfinder, DirectSample,
+       manypathfinder, apply_method, EpiAwareObservables, generated_observables,
+       spread_draws, get_param_array
 
 include("base.jl")
 include("utils.jl")

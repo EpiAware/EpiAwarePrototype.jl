@@ -377,14 +377,49 @@ function NegativeBinomialMeanClust(μ, α)
     return SafeNegativeBinomial(r, p)
 end
 
-@doc raw"
-Double-interval-censored, optionally right-truncated discretisation of a
-continuous distribution into a probability mass function.
+# Check `censored_cdf` arguments and return the time steps at the right edges of
+# the censor intervals. When `D` is `nothing` it is set to the `upper`th quantile
+# rounded to a multiple of `Δd`.
+function _check_and_give_ts(dist::Distribution, Δd, D, upper)
+    @assert minimum(dist)>=0.0 "Distribution must be non-negative."
+    @assert Δd>0.0 "Δd must be positive."
+    if isnothing(D)
+        x_q = invlogcdf(dist, log(upper))
+        D = round(Int64, x_q / Δd) * Δd
+    end
+    @assert D>=Δd "D can't be shorter than Δd."
+    ts = Δd:Δd:D |> collect
+    @assert ts[end]==D "D must be a multiple of Δd."
+    return ts
+end
 
-Given a continuous `dist`, integrate its CDF over successive intervals of width
-`Δd` up to right truncation `D` (default: the 99th percentile rounded up to a
-multiple of `Δd`) and normalise. Used to turn a continuous generation interval
-or reporting delay into the discrete PMF the models consume.
+@doc raw"
+CDF of ``X + U`` where ``X`` has the CDF of `dist` and ``U`` is uniform on
+``[0, Δd)``, evaluated at `t` by quadrature. Used to build the double-censored
+CDF and PMF.
+
+# Arguments
+
+  - `dist`: the continuous distribution.
+  - `t`: the evaluation point.
+  - `Δd`: the censoring-interval width.
+
+# Examples
+```@example intF
+using EpiAwarePrototype, Distributions
+EpiAwarePrototype.∫F(Exponential(1.0), 2.0, 1.0)
+```
+"
+function ∫F(dist, t, Δd)
+    return quadgk(u -> exp(logcdf(dist, t - u) - log(Δd)), 0.0, min(Δd, t))[1]
+end
+
+@doc raw"
+Discrete, double-interval-censored cumulative distribution function of a
+continuous distribution.
+
+Assumes a uniform distribution over primary-event times within censoring
+intervals of width `Δd`. Returns the (non-truncated) CDF with `0.0` prepended.
 
 # Arguments
 
@@ -392,9 +427,41 @@ or reporting delay into the discrete PMF the models consume.
 
 # Keyword Arguments
 
-  - `Δd`: the interval width of the discretisation (default `1.0`).
-  - `D`: the right-truncation point. When `nothing` (default) it is set to the
-    99th percentile of `dist` rounded up to a multiple of `Δd`.
+  - `Δd`: the censoring-interval width (default `1.0`).
+  - `D`: the right-truncation point; `nothing` (default) uses the `upper`th
+    quantile rounded to a multiple of `Δd`.
+  - `upper`: the quantile used when `D` is `nothing` (default `0.999`).
+
+# Examples
+```@example censored_cdf
+using EpiAwarePrototype, Distributions
+censored_cdf(Exponential(1.0); D = 10)
+```
+"
+function censored_cdf(dist::Distribution; Δd = 1.0, D = nothing, upper = 0.999)
+    ts = _check_and_give_ts(dist, Δd, D, upper)
+    cens_F = ts .|> t -> ∫F(dist, t, Δd)
+    return [0.0; cens_F]
+end
+
+@doc raw"
+Discrete, right-truncated, double-interval-censored probability mass function of
+a continuous distribution.
+
+Differences the double-censored CDF from [`censored_cdf`](@ref) and normalises.
+Used to turn a continuous generation interval or reporting delay into the
+discrete PMF the models consume.
+
+# Arguments
+
+  - `dist`: the continuous distribution to discretise.
+
+# Keyword Arguments
+
+  - `Δd`: the censoring-interval width (default `1.0`).
+  - `D`: the right-truncation point; `nothing` (default) uses the `upper`th
+    quantile rounded to a multiple of `Δd`.
+  - `upper`: the quantile used when `D` is `nothing` (default `0.99`).
 
 # Examples
 ```@example censored_pmf
@@ -402,26 +469,9 @@ using EpiAwarePrototype, Distributions
 censored_pmf(Gamma(2.0, 1.0))
 ```
 "
-function censored_pmf(dist::ContinuousDistribution; Δd = 1.0, D = nothing)
-    if isnothing(D)
-        D = quantile(dist, 0.99)
-        D = ceil(D / Δd) * Δd
-    end
-    ts = 0.0:Δd:D
-    @assert length(ts) > 1 "D must be greater than Δd"
-    # Double-interval-censoring: convolve the interval-censored CDF with a
-    # uniform primary-event window of width Δd, then difference and normalise.
-    cdfs = [_interval_censored_cdf(dist, t, Δd) for t in ts]
-    pmf = diff(cdfs)
-    return pmf ./ sum(pmf)
-end
-
-# Average CDF over a primary-event window [t-Δd, t], by quadrature.
-function _interval_censored_cdf(dist::ContinuousDistribution, t, Δd)
-    t <= 0 && return 0.0
-    lo = max(t - Δd, 0.0)
-    integral, _ = quadgk(u -> cdf(dist, t - u), 0.0, t - lo)
-    return integral / Δd
+function censored_pmf(dist::Distribution; Δd = 1.0, D = nothing, upper = 0.99)
+    cens_cdf = censored_cdf(dist; Δd, D, upper)
+    return cens_cdf |> diff |> p -> p ./ sum(p)
 end
 
 @doc raw"

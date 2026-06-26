@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "8efff642b5c9b9a0577e3b03537109497d6d0611"
+project_hash = "08b468940cc0140a885b8d0deb1909f92a2c39da"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "d9aaef7c63466eee4de23b4d9dad03629df54bea"
@@ -659,7 +659,7 @@ weakdeps = ["Adapt", "ChainRulesCore"]
     EnzymeCoreChainRulesCoreExt = "ChainRulesCore"
 
 [[deps.EpiAwarePrototype]]
-deps = ["Distributions", "DocStringExtensions", "DynamicPPL", "LinearAlgebra", "LogExpFunctions", "OrdinaryDiffEq", "QuadGK", "Random", "Reexport", "Statistics", "Turing"]
+deps = ["ADTypes", "AbstractMCMC", "AdvancedHMC", "DataFramesMeta", "Distributions", "DocStringExtensions", "DynamicPPL", "LinearAlgebra", "LogExpFunctions", "MCMCChains", "OrdinaryDiffEq", "Pathfinder", "QuadGK", "Random", "Reexport", "Statistics", "Turing"]
 path = "."
 uuid = "cbebd14a-101c-4997-a79f-d008ad7c07b2"
 version = "0.1.0-DEV"
@@ -2213,9 +2213,9 @@ version = "1.0.1"
 
 [[deps.Tables]]
 deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "OrderedCollections", "TableTraits"]
-git-tree-sha1 = "f2c1efbc8f3a609aadf318094f8fc5204bdaf344"
+git-tree-sha1 = "0f38a06c83f0007bbab3cf911262841c9a0f07e0"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "1.12.1"
+version = "1.13.0"
 
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]

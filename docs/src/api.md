@@ -50,6 +50,7 @@ ExpGrowthRate
 Renewal
 R_to_r
 r_to_R
+expected_Rt
 ```
 
 ## ODE compartmental models
@@ -95,11 +96,13 @@ EpiProblem
 EpiMethod
 NUTSampler
 ManyPathfinder
+DirectSample
 manypathfinder
 apply_method
 EpiAwareObservables
 generated_observables
 spread_draws
+get_param_array
 ```
 
 ## Utilities and distributions
@@ -112,5 +115,7 @@ SafePoisson
 SafeNegativeBinomial
 NegativeBinomialMeanClust
 censored_pmf
+censored_cdf
+∫F
 condition_model
 ```

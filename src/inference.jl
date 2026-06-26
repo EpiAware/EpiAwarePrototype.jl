@@ -258,6 +258,51 @@ function _apply_nuts(model, method, prev_result::PathfinderResult; kwargs...)
 end
 
 @doc raw"
+Direct sampling from a model's prior (no MCMC).
+
+`apply_method(model, ::DirectSample)` samples the prior: with an integer
+`n_samples` it draws that many times with `Turing.Prior()` (returning a chain),
+and with `nothing` it draws once with `rand` (returning a `NamedTuple`).
+
+## Fields
+
+  - `n_samples`: number of prior draws, or `nothing` for a single `rand` draw.
+"
+@kwdef struct DirectSample <: AbstractEpiSamplingMethod
+    "Number of prior draws, or `nothing` for a single `rand` draw."
+    n_samples::Union{Int, Nothing} = nothing
+end
+
+function _apply_method(model::DynamicPPL.Model, method::DirectSample,
+        prev_result = nothing; kwargs...)
+    return _apply_direct_sample(model, method, method.n_samples; kwargs...)
+end
+
+function _apply_direct_sample(model, method, n_samples::Int; kwargs...)
+    sample(
+        model, Turing.Prior(), n_samples; kwargs...)
+end
+_apply_direct_sample(model, method, ::Nothing; kwargs...) = rand(model)
+
+@doc raw"
+Reshape an `MCMCChains.Chains` object into a `(draws × chains)` array of
+per-sample `NamedTuple`s.
+
+# Arguments
+
+  - `chn`: the `Chains` object.
+
+# Examples
+```@example get_param_array
+using EpiAwarePrototype
+nothing
+```
+"
+function get_param_array(chn::Chains)
+    return rowtable(chn) |> x -> reshape(x, size(chn, 1), size(chn, 3))
+end
+
+@doc raw"
 Variational pre-sampler that runs Pathfinder several times and keeps the best run.
 
 ## Fields
