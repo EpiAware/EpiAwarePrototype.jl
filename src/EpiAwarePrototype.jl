@@ -31,7 +31,7 @@ using Reexport: @reexport
 using DynamicPPL: DynamicPPL, @model, to_submodel, fix, condition, prefix
 using Turing: Turing, filldist, arraydist
 using LinearAlgebra: dot
-using LogExpFunctions: softmax, xexpy
+using LogExpFunctions: softmax, xexpy, log1pexp
 using QuadGK: quadgk
 using Random: AbstractRNG, randexp
 
@@ -71,6 +71,10 @@ export EpiData, DirectInfections, ExpGrowthRate, Renewal,
 export PoissonError, NegativeBinomialError, LatentDelay,
        observation_error, generate_observation_error_priors
 
+# --- observation modifiers / manipulators ---
+export Ascertainment, ascertainment_dayofweek, Aggregate, PrefixObservationModel,
+       RecordExpectedObs, TransformObservationModel, StackObservationModels
+
 # --- composition ---
 export EpiAwareModel
 
@@ -81,6 +85,7 @@ include("latent_extra.jl")
 include("infections.jl")
 include("infections_extra.jl")
 include("observations.jl")
+include("observations_extra.jl")
 include("compose.jl")
 
 end

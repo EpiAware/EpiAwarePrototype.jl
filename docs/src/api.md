@@ -62,6 +62,18 @@ observation_error
 generate_observation_error_priors
 ```
 
+## Observation modifiers and manipulators
+
+```@docs
+Ascertainment
+ascertainment_dayofweek
+Aggregate
+PrefixObservationModel
+RecordExpectedObs
+TransformObservationModel
+StackObservationModels
+```
+
 ## Composition
 
 ```@docs
