@@ -170,8 +170,11 @@ right-truncated discretised PMF vector these sites need. Drop `censored_pmf.jl`.
       runs end-to-end.
 - [x] Full EpiAwareTestUtils test suite passes: 123 unit `@testitem`s + Aqua,
       ExplicitImports, docstring-format, doctest, formatting, JET (with a documented
-      JET-runner workaround). Suite is green, 0 fail / 0 error (326 docstring-format
-      "broken" are the reexported Distributions/Turing names, expected).
+      JET-runner workaround). Suite is green: 0 fail / 0 error / 0 broken. The
+      package does NOT blanket-reexport Distributions/Turing (upstream did not
+      either), so the docstring-format check only sees the package's own ~68
+      documented names — no skipped/“broken” third-party names. Users
+      `using EpiAwarePrototype, Distributions, Turing`.
 - [~] Docs ported + decluttered — honest set seeded (getting started, composable
       design, API reference covering the full surface); full worked-example narrative
       still to expand.

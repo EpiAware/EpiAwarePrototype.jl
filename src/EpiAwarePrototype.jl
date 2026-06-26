@@ -24,16 +24,13 @@ rand(as_turing_model(model, missing, 20))
 "
 module EpiAwarePrototype
 
-using Reexport: @reexport
-@reexport using Distributions
-@reexport using Turing
+# This package does NOT blanket-reexport Distributions/Turing (as the upstream
+# EpiAware also did not): users `using EpiAwarePrototype, Distributions, Turing`.
+# Only the names the prototype itself uses or extends are imported below, which
+# keeps the public surface to the package's own exports.
 
 using DynamicPPL: DynamicPPL, @model, to_submodel, fix, condition, prefix
-using Turing: Turing, filldist, arraydist, sample, NUTS, MCMCSerial
-# `sampler` is imported only to satisfy ExplicitImports: the `EpiMethod` field /
-# keyword named `sampler` (kept for parity) collides with the reexported
-# `Distributions.sampler`, which the analysis otherwise reports as implicit.
-using Turing: sampler
+using Turing: Turing, filldist, arraydist, sample, MCMCSerial
 using CensoredDistributions: double_interval_censored
 using LinearAlgebra: dot
 using LogExpFunctions: softmax, xexpy, log1pexp
@@ -49,15 +46,13 @@ using Pathfinder: pathfinder, PathfinderResult
 using DataFramesMeta: DataFrame, @rename!
 using Tables: rowtable
 
-# Names used (and, for many, extended) by the prototype. Imported explicitly so
-# the package surface stays analysable by ExplicitImports even though the whole
-# of Distributions/Turing is reexported for users above.
+# Distributions names used (and, for many, extended) by the prototype, imported
+# explicitly (not reexported).
 using Distributions: Distributions, Distribution, Sampleable,
                      ContinuousUnivariateDistribution, ContinuousDistribution,
                      Normal, Poisson, NegativeBinomial, Gamma, truncated,
                      cdf, ccdf, logcdf, logccdf, invlogcdf, pdf, logpdf, quantile,
-                     params, mean, var, std, mode, skewness, kurtosis, succprob,
-                     failprob
+                     params, mean, var, std, mode, skewness, kurtosis
 using Statistics: Statistics
 
 # --- core architecture ---

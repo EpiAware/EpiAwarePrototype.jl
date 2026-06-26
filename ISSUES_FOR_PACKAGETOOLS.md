@@ -103,10 +103,14 @@ otherwise explicitly `using Turing: Turing`) calling `test_explicit_imports`.
 **Suggested fix:** forward an `implicit_ignore` (or reuse `ignore`) to
 `check_no_implicit_imports` in `test_explicit_imports`.
 
-**Local workaround applied:** added `using Turing: Turing, ...` (and a matching
-explicit `using Distributions: ...` list) so the reexported module names are
-*also* explicit imports, satisfying `check_no_implicit_imports`. This works but
-should not be necessary purely to reexport a package.
+**Local workaround applied (then superseded):** initially added
+`using Turing: Turing, ...` so the reexported module names were also explicit
+imports. This was later made moot: the prototype stopped blanket-reexporting
+Distributions/Turing altogether (the upstream EpiAware did not reexport them
+either; users `using EpiAwarePrototype, Distributions, Turing`). That also drove
+the docstring-format check from ~326 skipped/"broken" third-party names to zero.
+The underlying helper limitation still stands for any package that *does* want to
+`@reexport`, so the issue remains worth fixing upstream.
 
 ---
 

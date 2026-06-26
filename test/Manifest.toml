@@ -780,7 +780,7 @@ uuid = "7aaea248-0d11-4a0d-a7dc-86da30abb951"
 version = "0.1.0"
 
 [[deps.EpiAwarePrototype]]
-deps = ["ADTypes", "AbstractMCMC", "AdvancedHMC", "CensoredDistributions", "DataFramesMeta", "Distributions", "DocStringExtensions", "DynamicPPL", "LinearAlgebra", "LogExpFunctions", "MCMCChains", "OrdinaryDiffEq", "Pathfinder", "Random", "Reexport", "Statistics", "Tables", "Turing"]
+deps = ["ADTypes", "AbstractMCMC", "AdvancedHMC", "CensoredDistributions", "DataFramesMeta", "Distributions", "DocStringExtensions", "DynamicPPL", "LinearAlgebra", "LogExpFunctions", "MCMCChains", "OrdinaryDiffEq", "Pathfinder", "Random", "Statistics", "Tables", "Turing"]
 path = ".."
 uuid = "cbebd14a-101c-4997-a79f-d008ad7c07b2"
 version = "0.1.0-DEV"

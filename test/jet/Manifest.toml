@@ -699,7 +699,7 @@ weakdeps = ["Adapt", "ChainRulesCore"]
     EnzymeCoreChainRulesCoreExt = "ChainRulesCore"
 
 [[deps.EpiAwarePrototype]]
-deps = ["ADTypes", "AbstractMCMC", "AdvancedHMC", "CensoredDistributions", "DataFramesMeta", "Distributions", "DocStringExtensions", "DynamicPPL", "LinearAlgebra", "LogExpFunctions", "MCMCChains", "OrdinaryDiffEq", "Pathfinder", "Random", "Reexport", "Statistics", "Tables", "Turing"]
+deps = ["ADTypes", "AbstractMCMC", "AdvancedHMC", "CensoredDistributions", "DataFramesMeta", "Distributions", "DocStringExtensions", "DynamicPPL", "LinearAlgebra", "LogExpFunctions", "MCMCChains", "OrdinaryDiffEq", "Pathfinder", "Random", "Statistics", "Tables", "Turing"]
 path = "../.."
 uuid = "cbebd14a-101c-4997-a79f-d008ad7c07b2"
 version = "0.1.0-DEV"
