@@ -31,7 +31,7 @@ using Reexport: @reexport
 using DynamicPPL: DynamicPPL, @model, to_submodel, fix, condition, prefix
 using Turing: Turing, filldist, arraydist
 using LinearAlgebra: dot
-using LogExpFunctions: softmax
+using LogExpFunctions: softmax, xexpy
 using QuadGK: quadgk
 using Random: AbstractRNG, randexp
 
@@ -64,7 +64,8 @@ export TransformLatentModel, PrefixLatentModel, RecordExpectedLatent,
        broadcast_weekly, equal_dimensions, arma, arima
 
 # --- infection models ---
-export EpiData, DirectInfections
+export EpiData, DirectInfections, ExpGrowthRate, Renewal,
+       R_to_r, r_to_R
 
 # --- observation models ---
 export PoissonError, NegativeBinomialError, LatentDelay,
@@ -78,6 +79,7 @@ include("utils.jl")
 include("latent.jl")
 include("latent_extra.jl")
 include("infections.jl")
+include("infections_extra.jl")
 include("observations.jl")
 include("compose.jl")
 

@@ -46,6 +46,10 @@ arima
 ```@docs
 EpiData
 DirectInfections
+ExpGrowthRate
+Renewal
+R_to_r
+r_to_R
 ```
 
 ## Observation models
