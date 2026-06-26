@@ -102,25 +102,30 @@ as_turing_model(model, args...; kwargs...)  # returns a DynamicPPL.Model
 
 ## Build strategy
 
-**Port the whole package**, not a subset. Scaffold + skeleton + attribution/licence,
-then port **all** components from upstream onto the new `as_turing_model` API on the
-latest Turing (every latent model, infection model, observation model, their
-manipulators/modifiers, the inference methods, and the problem/method glue), keeping
-the package coherent and loading throughout. The target is a **working full version**
-that loads, samples end-to-end, and passes the core EpiAwareTestUtils checks.
+**Port the COMPLETE package.** Every upstream source file, module, model, helper,
+manipulator/modifier, inference method, the problem/method glue, the tests, and the
+docs — all of it, ported and adapted to the new `as_turing_model` API on the latest
+Turing. **Nothing stubbed, nothing deferred, no functionality dropped.** Full feature
+parity with upstream `EpiAware`, just re-architected and renamed.
+
+The scaffold-from-EpiAwarePackageTools, Apache-2.0 licence + NOTICE/attribution,
+"never reference the private repo", commit-to-`main`, and issue-logging rules are
+*how* the port is done — they are not a reduction of scope.
 
 Sequence the work so `main` stays loadable (port in dependency order, commit in
-logical chunks), but the deliverable is full feature parity adapted to the new API —
-not a slice. Only switch to the review-PR workflow once there is a working version.
+logical chunks). The deliverable is the **complete, working package**: it loads, every
+ported model can be constructed and sampled, end-to-end composed models run
+(rand/fix/condition/NUTS), and the full EpiAwareTestUtils test suite passes. Only
+switch to the review-PR workflow once that complete version works.
 
 ## Current status
 
 - [ ] Repo scaffolded from EpiAwarePackageTools (`scaffold`)
 - [ ] Package skeleton renamed to `EpiAwarePrototype` (fresh UUID)
 - [ ] Apache-2.0 LICENSE + NOTICE + attribution disclaimer in place
-- [ ] All components ported onto `as_turing_model` (latest Turing); package loads
-- [ ] Representative composed model samples end-to-end (rand/fix/condition/NUTS)
-- [ ] Core tests pass via EpiAwareTestUtils helpers
+- [ ] COMPLETE package ported onto `as_turing_model` (latest Turing) — nothing stubbed
+- [ ] Package loads; every ported model constructs + samples; composed models run NUTS
+- [ ] Full EpiAwareTestUtils test suite passes
 - [ ] Docs ported + decluttered
 - [ ] Issues filed against EpiAwarePackageTools for any template gaps
-- [ ] Working full port → branch protection added → switch to review-PR workflow
+- [ ] Complete working port → branch protection added → switch to review-PR workflow
