@@ -156,12 +156,49 @@ right-truncated discretised PMF vector these sites need. Drop `censored_pmf.jl`.
 
 ## Current status
 
-- [ ] Repo scaffolded from EpiAwarePackageTools (`scaffold`)
-- [ ] Package skeleton renamed to `EpiAwarePrototype` (fresh UUID)
-- [ ] Apache-2.0 LICENSE + NOTICE + attribution disclaimer in place
-- [ ] COMPLETE package ported onto `as_turing_model` (latest Turing) — nothing stubbed
-- [ ] Package loads; every ported model constructs + samples; composed models run NUTS
-- [ ] Full EpiAwareTestUtils test suite passes
-- [ ] Docs ported + decluttered
-- [ ] Issues filed against EpiAwarePackageTools for any template gaps
+- [x] Repo scaffolded from EpiAwarePackageTools (`scaffold`)
+- [x] Package skeleton renamed to `EpiAwarePrototype` (fresh UUID
+      `cbebd14a-101c-4997-a79f-d008ad7c07b2`)
+- [x] Apache-2.0 LICENSE + NOTICE + attribution disclaimer in place
+- [~] COMPLETE package ported onto `as_turing_model` (latest Turing) — nothing stubbed
+      — **vertical slice done; remaining submodules in progress.** See
+      "Ported so far" below. Validated on Turing 0.45 / DynamicPPL 0.41, Julia 1.12.
+- [~] Package loads; every ported model constructs + samples; composed models run NUTS
+      — true for everything ported so far (composed `EpiAwareModel` runs
+      rand/fix/condition/`|`/NUTS-50); not yet for the not-yet-ported components.
+- [x] Full EpiAwareTestUtils test suite passes (for the current surface): 36 unit
+      `@testitem`s + Aqua, ExplicitImports, docstring-format, doctest, formatting,
+      JET (with a documented JET-runner workaround). Suite is green, 0 fail/0 error.
+- [~] Docs ported + decluttered — minimal honest set seeded (getting started,
+      composable design, API reference); full narrative pending.
+- [x] Issues filed against EpiAwarePackageTools for any template gaps
+      (`ISSUES_FOR_PACKAGETOOLS.md`: LICENSE override, JET runner, ExplicitImports
+      `@reexport`, doctest `@meta` under TestItemRunner).
 - [ ] Complete working port → branch protection added → switch to review-PR workflow
+
+### Ported so far (vertical slice — loads, samples, tested)
+
+- Base/utils: `AbstractEpiAwareModel`, `as_turing_model` generic, `accumulate_scan`
+  + `AbstractAccumulationStep`, `HalfNormal`, `SafePoisson`, `SafeNegativeBinomial`,
+  `NegativeBinomialMeanClust`, `censored_pmf`, `condition_model`, flat `show`.
+- Latent: `IID`, `HierarchicalNormal`, `RandomWalk`, `AR`, `MA`, `Intercept`,
+  `FixedIntercept`, `Null`, `DiffLatentModel` (ARIMA-style via Diff∘AR).
+- Infections: `EpiData`, `DirectInfections`.
+- Observations: `PoissonError`, `NegativeBinomialError`, `LatentDelay`.
+- Composition: `EpiAwareModel` (latent → infections → observations).
+
+### Not yet ported (remaining for the COMPLETE port)
+
+- Latent combinations/manipulators/modifiers: `arima`/`arma` combinators,
+  `CombineLatentModels`, `ConcatLatentModels`, broadcast rules, `TransformLatentModel`,
+  `PrefixLatentModel`, `RecordExpectedLatent`; ODE latent (`SIRParams`, `SEIRParams`).
+- Infections: `Renewal` (+ `RenewalSteps`), `ExpGrowthRate`, `ODEProcess`,
+  `R_to_r`/`r_to_R`, `expected_Rt`.
+- Observations: `Ascertainment` (+ day-of-week), `Aggregate`,
+  `TransformObservationModel`, `PrefixObservationModel`, `RecordExpectedObs`,
+  `StackObservationModels`.
+- Inference: `NUTSampler`, `ManyPathfinder`; `EpiProblem`/`EpiMethod` glue,
+  `apply_method`, `EpiAwareObservables`, post-inference/`spread_draws`/`get_param_array`.
+- **Open decision (from brief):** migrate censoring to **CensoredDistributions.jl**
+  (drop the bespoke `censored_pmf`), watching the shared-UUID clash with upstream
+  EpiAware. Not yet done — current slice uses a local `censored_pmf`.

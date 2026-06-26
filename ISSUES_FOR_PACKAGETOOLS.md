@@ -37,3 +37,91 @@ is never reverted by a sync.
 text after scaffolding, added a `NOTICE`, and recorded the override here. The
 managed-file revert risk above remains until this is fixed upstream — anyone
 running `update()` on this package must re-apply the Apache-2.0 `LICENSE`.
+
+---
+
+## 2. JET runner cannot analyse a DynamicPPL `@model` package cleanly
+
+**Expected:** A Turing/`DynamicPPL` package (whose core surface is `@model`
+functions) can pass the scaffolded JET check, since `@model` is the normal way
+to write such a package.
+
+**What happened:** The managed `test/jet/runtests.jl` calls
+`JET.report_package(mod; target_modules = (mod,))` and fails on any report. For
+a `@model` package this always fails: JET emits a
+`local variable `x` is not defined` (`UndefVarErrorReport`) for *every*
+`~`-assigned variable, because the tilde macro hides the assignment from JET's
+static analysis. Our package gets 19 such false positives (`ar_init`, `ϵ_t`,
+`damp_AR`, `priors`, `Z_t`, `I_t`, ... — all `~` targets), none of which is a
+real defect (the models sample correctly under NUTS). Notably, the package this
+prototype is adapted from avoided JET entirely and used only Aqua, which
+suggests this incompatibility is long-standing.
+
+**Minimal repro:** scaffold any package whose public functions are Turing
+`@model`s and run `julia --project=test/jet test/jet/runtests.jl`.
+
+**Suggested fix:** give the JET helper / managed runner a hook to filter
+reports — e.g. a `report_filter` callback, or built-in suppression of
+`UndefVarErrorReport`s whose enclosing `MethodInstance` takes the DynamicPPL
+evaluator signature `(::DynamicPPL.Model, ::DynamicPPL.AbstractVarInfo, ...)`.
+Alternatively allow `qa_config.jl` to disable the JET testset for `@model`
+packages.
+
+**Local workaround applied:** replaced the managed `test/jet/runtests.jl` with a
+version that runs `report_package`, drops exactly the `UndefVarErrorReport`s
+arising in `@model`-generated methods (matched on the evaluator signature), and
+fails on any *other* report. Added `DynamicPPL` to `test/jet/Project.toml`
+(within the template's stated "add packages JET needs" allowance). A
+template-sync will revert the runner; it must be re-applied until the helper
+supports a filter.
+
+---
+
+## 3. `test_explicit_imports` un-ignorable `check_no_implicit_imports` breaks `@reexport`
+
+**Expected:** A package that reexports a dependency with
+`@reexport using SomePkg` (a standard, recommended pattern, used by the package
+this prototype is adapted from) can pass `test_explicit_imports`.
+
+**What happened:** `test_explicit_imports(mod; ignore)` forwards `ignore` only to
+`check_all_explicit_imports_are_public`, **not** to `check_no_implicit_imports`.
+`@reexport using Turing` makes the bare module name `Turing` an implicit import,
+which `check_no_implicit_imports` flags with no way to ignore it via the helper.
+
+**Minimal repro:** a package with `@reexport using Turing` (and which does not
+otherwise explicitly `using Turing: Turing`) calling `test_explicit_imports`.
+
+**Suggested fix:** forward an `implicit_ignore` (or reuse `ignore`) to
+`check_no_implicit_imports` in `test_explicit_imports`.
+
+**Local workaround applied:** added `using Turing: Turing, ...` (and a matching
+explicit `using Distributions: ...` list) so the reexported module names are
+*also* explicit imports, satisfying `check_no_implicit_imports`. This works but
+should not be necessary purely to reexport a package.
+
+---
+
+## 4. `test_doctest` + `@meta CurrentModule` fails under TestItemRunner isolation
+
+**Expected:** `@meta CurrentModule = MyPackage` blocks in `docs/src/*.md` (the
+standard Documenter idiom) work with the scaffolded `test_doctest` testset.
+
+**What happened:** `test_doctest(mod)` calls `Documenter.doctest(mod)`, which
+evaluates each page's `@meta CurrentModule = MyPackage` block against `Main`.
+Run standalone this is fine (the REPL/`make.jl` has `using MyPackage`), but under
+`TestItemRunner` the `@testitem` body runs in a sandbox module, so `Main` has no
+`MyPackage` binding and every `@meta` block errors with
+`UndefVarError: MyPackage not defined in Main`, failing the doctest testset.
+
+**Minimal repro:** add `@meta CurrentModule = MyPackage` to a `docs/src` page and
+run the scaffolded `test/runtests.jl` (which drives the doctest testitem via
+TestItemRunner).
+
+**Suggested fix:** have `test_doctest` import the target module into the doctest
+evaluation `Main` (or pass a `Module` to `Documenter.doctest`) so `@meta` blocks
+resolve under TestItemRunner.
+
+**Local workaround applied:** removed the `@meta CurrentModule` blocks from the
+docs pages. `Documenter.doctest` skips template expansion so it does not need
+them, and `docs/make.jl` uses exported names plus `setdocmeta!` for the full
+build's cross-references.
