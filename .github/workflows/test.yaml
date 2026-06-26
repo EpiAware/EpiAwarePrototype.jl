@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   test:
-    uses: EpiAware/.github/.github/workflows/tests.yml@dc919e0d1674c16d1518df07eda5ee0be09b47e2
+    uses: EpiAware/.github/.github/workflows/tests.yml@42a0501ccacefbfc2f2eeca640714a19c50bfe58
     secrets: inherit  # pragma: allowlist secret
 
   downgrade-compat:
