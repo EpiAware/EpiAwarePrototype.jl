@@ -88,6 +88,20 @@ StackObservationModels
 EpiAwareModel
 ```
 
+## Inference orchestration
+
+```@docs
+EpiProblem
+EpiMethod
+NUTSampler
+ManyPathfinder
+manypathfinder
+apply_method
+EpiAwareObservables
+generated_observables
+spread_draws
+```
+
 ## Utilities and distributions
 
 ```@docs

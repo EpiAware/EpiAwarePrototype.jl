@@ -29,12 +29,24 @@ using Reexport: @reexport
 @reexport using Turing
 
 using DynamicPPL: DynamicPPL, @model, to_submodel, fix, condition, prefix
-using Turing: Turing, filldist, arraydist
+using Turing: Turing, filldist, arraydist, sample, NUTS, MCMCSerial
+# `sampler` is imported only to satisfy ExplicitImports: the `EpiMethod` field /
+# keyword named `sampler` (kept for parity) collides with the reexported
+# `Distributions.sampler`, which the analysis otherwise reports as implicit.
+using Turing: sampler
 using LinearAlgebra: dot
 using LogExpFunctions: softmax, xexpy, log1pexp
 using OrdinaryDiffEq: ODEProblem, ODEFunction, solve, remake, AutoVern7, Rodas5P
 using QuadGK: quadgk
 using Random: AbstractRNG, randexp
+
+# Inference-layer dependencies.
+using ADTypes: ADTypes, AutoForwardDiff
+using AbstractMCMC: AbstractMCMC
+using AdvancedHMC: DiagEuclideanMetric
+using MCMCChains: Chains
+using Pathfinder: pathfinder, PathfinderResult
+using DataFramesMeta: DataFrame, @rename!
 
 # Names used (and, for many, extended) by the prototype. Imported explicitly so
 # the package surface stays analysable by ExplicitImports even though the whole
@@ -82,6 +94,10 @@ export Ascertainment, ascertainment_dayofweek, Aggregate, PrefixObservationModel
 # --- composition ---
 export EpiAwareModel
 
+# --- inference orchestration ---
+export EpiProblem, EpiMethod, NUTSampler, ManyPathfinder, manypathfinder,
+       apply_method, EpiAwareObservables, generated_observables, spread_draws
+
 include("base.jl")
 include("utils.jl")
 include("latent.jl")
@@ -92,5 +108,6 @@ include("ode.jl")
 include("observations.jl")
 include("observations_extra.jl")
 include("compose.jl")
+include("inference.jl")
 
 end
