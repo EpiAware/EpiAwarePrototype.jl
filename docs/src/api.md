@@ -52,6 +52,14 @@ R_to_r
 r_to_R
 ```
 
+## ODE compartmental models
+
+```@docs
+SIRParams
+SEIRParams
+ODEProcess
+```
+
 ## Observation models
 
 ```@docs

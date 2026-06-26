@@ -1,30 +1,27 @@
-# PACKAGE-OWNED — scaffold writes this once and never overwrites it.
-# The test environment. Seeded with the deps the shared QA helpers and AD
-# harness need; add the package's own test-only deps here. EpiAwarePackageTools
-# supplies the helpers; until it is registered, pin it via `[sources]` below.
 [deps]
 ADTypes = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 DifferentiationInterface = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
 DifferentiationInterfaceTest = "a82114a7-5aa3-49a8-9643-716bb13727a3"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DynamicPPL = "366bfd00-2699-11ea-058f-f148b4cae6d8"
 EpiAwarePackageTools = "7aaea248-0d11-4a0d-a7dc-86da30abb951"
+EpiAwarePrototype = "cbebd14a-101c-4997-a79f-d008ad7c07b2"
 ExplicitImports = "7d51a73a-1435-4ff3-83d9-f097790105c7"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
 JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
+LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
-EpiAwarePrototype = "cbebd14a-101c-4997-a79f-d008ad7c07b2"
-Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
-DynamicPPL = "366bfd00-2699-11ea-058f-f148b4cae6d8"
-Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [sources]
+EpiAwarePackageTools = {rev = "main", url = "https://github.com/EpiAware/EpiAwarePackageTools.jl"}
 EpiAwarePrototype = {path = ".."}
-# Until EpiAwarePackageTools is registered, pin it by git:
-EpiAwarePackageTools = {url = "https://github.com/EpiAware/EpiAwarePackageTools.jl", rev = "main"}

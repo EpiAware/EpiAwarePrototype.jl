@@ -32,6 +32,7 @@ using DynamicPPL: DynamicPPL, @model, to_submodel, fix, condition, prefix
 using Turing: Turing, filldist, arraydist
 using LinearAlgebra: dot
 using LogExpFunctions: softmax, xexpy, log1pexp
+using OrdinaryDiffEq: ODEProblem, ODEFunction, solve, remake, AutoVern7, Rodas5P
 using QuadGK: quadgk
 using Random: AbstractRNG, randexp
 
@@ -67,6 +68,9 @@ export TransformLatentModel, PrefixLatentModel, RecordExpectedLatent,
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
        R_to_r, r_to_R
 
+# --- ODE compartmental models ---
+export SIRParams, SEIRParams, ODEProcess
+
 # --- observation models ---
 export PoissonError, NegativeBinomialError, LatentDelay,
        observation_error, generate_observation_error_priors
@@ -84,6 +88,7 @@ include("latent.jl")
 include("latent_extra.jl")
 include("infections.jl")
 include("infections_extra.jl")
+include("ode.jl")
 include("observations.jl")
 include("observations_extra.jl")
 include("compose.jl")
